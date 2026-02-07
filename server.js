@@ -1,14 +1,17 @@
 import http from 'node:http'
-import { createRoom, joinRoom } from './routes/room.routes'
+import { createRoom, joinRoom, startGame, subscribeToRoom } from './routes/room.routes'
+import { subscribe } from 'node:diagnostics_channel'
 
 const PORT = 8000
 const server = http.createServer((req, res) => {
-    if (req.url === '/room/create' && req.method === 'POST') {
+    if (req.url === '/room/create' && req.method === 'POST') 
         createRoom(req, res)
-    }
-    if (req.url === '/room/join' && req.method === 'PUT') {
+    if (req.url === '/room/join' && req.method === 'PUT') 
         joinRoom(req, res)
-    }
+    if (req.url === '/room/subscribe' && req.method === 'GET') 
+        subscribeToRoom(req, res)
+    if (req.url === '/room/start' && req.method === 'POST') 
+        startGame(req, res)
 })
 
 server.listen(PORT, () => {

@@ -6,6 +6,7 @@ export function initRoom(password = null) {
     const room = {
         id: id,
         password: password,
+        owner: '',
         players: [],
         state: 'waiting',
         moves: {}
@@ -16,11 +17,25 @@ export function initRoom(password = null) {
 }
 
 // creates player and adds them to the room
-export function addPlayerToRoom(id) {
-    const room = rooms.get(id)
-    if (!room) 
-        throw new Error('ROOM_NOT_FOUND')
+export function addPlayerToRoom(room) {
+    room = rooms.get(room)
+    if (!room) throw new Error('ROOM_NOT_FOUND')
     const user = crypto.randomUUID()
     room.players.push(user)
     return user
+}
+
+export function setOwnerOfRoom(room, user) {
+    room = rooms.get(room)
+    room.owner = user
+}
+
+export function attemptStart(room, user) {
+    room = rooms.get(room)
+
+    if (!room) throw new Error('ROOM_NOT_FOUND')
+    if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
+    if (room.owner !== user) throw new Error('USER_NOT_OWNER')
+
+    room.state = 'playing'
 }
