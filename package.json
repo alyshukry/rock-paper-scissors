@@ -1,0 +1,16 @@
+{
+  "name": "rock-paper-scissors",
+  "version": "1.0.0",
+  "description": "A rock paper scissors game to play against your friends.",
+  "license": "MIT",
+  "author": "Aly Shukry <alyshukry.dev@gmail.com> (https://alyshukry.works)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
