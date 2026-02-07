@@ -8,7 +8,7 @@ export function initRoom(password = null) {
         password: password,
         owner: '',
         players: [],
-        subscribers: [],
+        subscribers: new Map(),
         state: 'waiting',
         moves: {}
     }
@@ -34,11 +34,11 @@ export function setOwnerOfRoom(room, user) {
     room.owner = user
 }
 
-export function addSubscriberToRoom(room, res) {
+export function addSubscriberToRoom(room, user, res) {
     room = rooms.get(room)
     if (!room) throw new Error('ROOM_NOT_FOUND')
 
-    room.subscribers.push(res)
+    room.subscribers.set(user, res)
 }
 
 export function attemptStart(room, user) {
@@ -49,4 +49,11 @@ export function attemptStart(room, user) {
     if (room.owner !== user) throw new Error('USER_NOT_OWNER')
 
     room.state = 'playing'
+    for (const [user, res] of room.subscribers) {
+        res.write(`data: ${JSON.stringify({
+            'type': 'game_started'
+        })}\n\n`)
+    }
+
+
 }

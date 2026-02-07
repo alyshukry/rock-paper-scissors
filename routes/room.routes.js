@@ -5,8 +5,7 @@ export async function createRoom(req, res) {
     for await (const chunk of req) body += chunk
 
     try {
-        if (!body) throw new Error('Empty body')
-        const data = JSON.parse(body)
+        const data = body ? JSON.parse(body) : {}
 
         const room = initRoom(data.password)
         const user = addPlayerToRoom(room.id)
@@ -16,8 +15,8 @@ export async function createRoom(req, res) {
             'Content-Type': 'application/json'
         })
         res.end(JSON.stringify({
-            'room_id': room.id,
-            'user_id': user
+            'room': room.id,
+            'user': user
         }))
     }
     catch (err) {
@@ -26,7 +25,7 @@ export async function createRoom(req, res) {
         })
         res.end(JSON.stringify({
             'status': 400,
-            'message': err
+            'message': err.message
         }))
     }
 }
@@ -45,8 +44,8 @@ export async function joinRoom(req, res) {
             'Content-Type': 'application/json'
         })
         res.end(JSON.stringify({
-            'room_id': room,
-            'user_id': user
+            'room': data.room,
+            'user': user
         }))
     }
     catch (err) {
@@ -71,7 +70,7 @@ export async function joinRoom(req, res) {
     }
 }
 
-export function subscribeToRoom(req, res) {
+export async function subscribeToRoom(req, res) {
     let body = ''
     for await (const chunk of req) body += chunk
 
@@ -85,7 +84,7 @@ export function subscribeToRoom(req, res) {
             'Connection': 'keep-alive'
         })
 
-        addSubscriberToRoom(data.room, res)
+        addSubscriberToRoom(data.room, data.user, res)
 
         res.write(JSON.stringify({
             'status': 200,
@@ -128,7 +127,7 @@ export async function startGame(req, res) {
             'Content-Type': 'application/json'
         })
         res.end(JSON.stringify({
-            'room_id': data.room,
+            'room': data.room,
             'message': 'Room started game'
         }))
     }

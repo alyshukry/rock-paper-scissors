@@ -1,5 +1,5 @@
 import http from 'node:http'
-import { createRoom, joinRoom, startGame, subscribeToRoom } from './routes/room.routes'
+import { createRoom, joinRoom, startGame, subscribeToRoom } from './routes/room.routes.js'
 
 const PORT = 8000
 const server = http.createServer((req, res) => {
