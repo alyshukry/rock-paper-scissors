@@ -8,6 +8,7 @@ export function initRoom(password = null) {
         password: password,
         owner: '',
         players: [],
+        subscribers: [],
         state: 'waiting',
         moves: {}
     }
@@ -27,7 +28,17 @@ export function addPlayerToRoom(room) {
 
 export function setOwnerOfRoom(room, user) {
     room = rooms.get(room)
+    if (!room) throw new Error('ROOM_NOT_FOUND')
+    if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
+
     room.owner = user
+}
+
+export function addSubscriberToRoom(room, res) {
+    room = rooms.get(room)
+    if (!room) throw new Error('ROOM_NOT_FOUND')
+
+    room.subscribers.push(res)
 }
 
 export function attemptStart(room, user) {

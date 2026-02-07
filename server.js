@@ -1,6 +1,5 @@
 import http from 'node:http'
 import { createRoom, joinRoom, startGame, subscribeToRoom } from './routes/room.routes'
-import { subscribe } from 'node:diagnostics_channel'
 
 const PORT = 8000
 const server = http.createServer((req, res) => {

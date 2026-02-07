@@ -1,4 +1,4 @@
-import { addPlayerToRoom, initRoom, setOwnerOfRoom } from '../services/room.service.js'
+import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom } from '../services/room.service.js'
 
 export async function createRoom(req, res) {
     let body = ''
@@ -72,7 +72,46 @@ export async function joinRoom(req, res) {
 }
 
 export function subscribeToRoom(req, res) {
+    let body = ''
+    for await (const chunk of req) body += chunk
 
+    try {
+        if (!body) throw new Error('Empty body')
+        const data = JSON.parse(body)
+
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        })
+
+        addSubscriberToRoom(data.room, res)
+
+        res.write(JSON.stringify({
+            'status': 200,
+            'message': 'Subscribed to game'
+        }))
+    }
+    catch (err) {
+        if (err.message === 'ROOM_NOT_FOUND') {
+            res.writeHead(404, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify({
+                'status': 404,
+                'message': 'Room not found'
+            }))
+        }
+        else {
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify({
+                'status': 400,
+                'message': err.message
+            }))
+        }
+    }
 }
 
 export async function startGame(req, res) {
