@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <script>
+        console.log('yo')
+        // Fetch the rooms file to get the first room
+        fetch('http://localhost:8000/rooms.json')
+            .then(res => res.json())
+            .then(rooms => {
+                // Pick first room and user
+                const roomIds = Object.keys(rooms)
+                if (!roomIds.length) throw new Error('No rooms available')
+
+                const room = roomIds[0]
+                const user = rooms.get(roomIds).players[1] // default user for testing
+                console.log(user)
+
+                const es = new EventSource(
+                    `http://localhost:8000/room/subscribe?room=${room}&user=${user}`
+                )
+                es.onmessage = (e) => console.log('EVENT:', e.data)
+            })
+            .catch(err => console.error('Failed to load rooms:', err))
+    </script>
+</body>
+
+</html>
