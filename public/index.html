@@ -13,8 +13,7 @@
                 if (!roomIds.length) throw new Error('No rooms available')
 
                 const room = roomIds[0]
-                const user = rooms[roomIds[0]].players[1]
-                console.log(user)
+                const user = rooms[roomIds[0]].players[0]
 
                 const es = new EventSource(
                     `http://localhost:8000/room/subscribe?room=${room}&user=${user}`

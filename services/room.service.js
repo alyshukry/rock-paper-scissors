@@ -65,6 +65,7 @@ export function registerMove(user, room, move) {
 
     if (!room) throw new Error('ROOM_NOT_FOUND')
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
+    if (room.state !== 'playing') throw new Error('GAME_NOT_STARTED')
 
     room.moves.set(user, move[0].toLowerCase())
     for (const [u, res] of room.subscribers) {
@@ -85,5 +86,6 @@ export function registerMove(user, room, move) {
         }
 
         room.moves.clear()
+        room.state = 'waiting'
     }
 }

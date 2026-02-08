@@ -1,6 +1,6 @@
 import http from 'node:http'
 import { createRoom, joinRoom, startGame, subscribeToRoom, playMove } from './routes/room.routes.js'
-import { saveRooms } from './store/rooms.store.js'
+import { saveRooms, rooms } from './store/rooms.store.js'
 
 const PORT = 8000
 const server = http.createServer(async (req, res) => {
@@ -14,7 +14,19 @@ const server = http.createServer(async (req, res) => {
         res.end()
         return
     }
-
+    if (req.url === '/rooms.json' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        const obj = {}
+        for (const [id, room] of rooms) {
+            obj[id] = {
+                ...room,
+                subscribers: {},
+                moves: Object.fromEntries(room.moves)
+            }
+        }
+        res.end(JSON.stringify(obj))
+        return
+    }
     if (req.url.startsWith('/room/create') && req.method === 'POST')
         await createRoom(req, res)
     else if (req.url.startsWith('/room/join') && req.method === 'PUT')

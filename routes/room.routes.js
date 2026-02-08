@@ -201,8 +201,12 @@ export async function playMove(req, res) {
 
         registerMove(data.user, data.room, data.move)
 
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ success: true }))
+        res.writeHead(200, {
+            'Content-Type': 'application/json'
+        })
+        res.end(JSON.stringify({
+            'status': 200
+        }))
     }
     catch (err) {
 
