@@ -1,4 +1,4 @@
-import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom, attemptStart } from '../services/room.service.js'
+import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom, attemptStart, registerMove } from '../services/room.service.js'
 
 export async function createRoom(req, res) {
     let body = ''
@@ -90,7 +90,7 @@ export function subscribeToRoom(req, res) {
         res.write(`data: ${JSON.stringify({ type: 'subscribed' })}\n\n`)
 
         req.on('close', () => {
-            room.subscribers.delete(user)
+            room.subscribers.delete(params.get('user'))
         })
     }
     catch (err) {
@@ -200,6 +200,9 @@ export async function playMove(req, res) {
         const data = JSON.parse(body)
 
         registerMove(data.user, data.room, data.move)
+
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true }))
     }
     catch (err) {
 

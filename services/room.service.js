@@ -58,7 +58,6 @@ export function attemptStart(room, user) {
         })}\n\n`)
     }
 
-
 }
 
 export function registerMove(user, room, move) {
@@ -76,7 +75,7 @@ export function registerMove(user, room, move) {
     }
 
     // check if both players played
-    if (room.moves.size() === 2) {
+    if (room.moves.size === 2) {
         const winner = decideWinner(room.moves)
         for (const [u, res] of room.subscribers) {
             res.write(`data: ${JSON.stringify({
