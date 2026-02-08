@@ -1,0 +1,14 @@
+{
+    "7ccaaa90-f36a-4b24-9836-51e4cd27763d": {
+        "id": "7ccaaa90-f36a-4b24-9836-51e4cd27763d",
+        "password": null,
+        "owner": "3dc941d4-04e2-4d75-8b70-49314cec56e1",
+        "players": [
+            "3dc941d4-04e2-4d75-8b70-49314cec56e1",
+            "29ee5bc1-922d-4ce2-a1d5-97cea2d59a55"
+        ],
+        "subscribers": {},
+        "state": "playing",
+        "moves": {}
+    }
+}
