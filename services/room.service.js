@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { rooms } from '../store/rooms.store.js'
+import { decideWinner } from './game.service.js'
 
 export function initRoom(password = null) {
     const id = crypto.randomUUID()
@@ -10,7 +11,7 @@ export function initRoom(password = null) {
         players: [],
         subscribers: new Map(),
         state: 'waiting',
-        moves: {}
+        moves: new Map()
     }
     rooms.set(id, room)
 
@@ -40,6 +41,7 @@ export function addSubscriberToRoom(room, user, res) {
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
 
     room.subscribers.set(user, res)
+    return room
 }
 
 export function attemptStart(room, user) {
@@ -57,4 +59,32 @@ export function attemptStart(room, user) {
     }
 
 
+}
+
+export function registerMove(user, room, move) {
+    room = rooms.get(room)
+
+    if (!room) throw new Error('ROOM_NOT_FOUND')
+    if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
+
+    room.moves.set(user, move[0].toLowerCase())
+    for (const [u, res] of room.subscribers) {
+        if (u !== user)
+            res.write(`data: ${JSON.stringify({
+                'type': 'move_played'
+            })}\n\n`)
+    }
+
+    // check if both players played
+    if (room.moves.size() === 2) {
+        const winner = decideWinner(room.moves)
+        for (const [u, res] of room.subscribers) {
+            res.write(`data: ${JSON.stringify({
+                'type': 'game_result',
+                'result': winner ? u === winner ? 'win' : 'lose' : 'draw'
+            })}\n\n`)
+        }
+
+        room.moves.clear()
+    }
 }

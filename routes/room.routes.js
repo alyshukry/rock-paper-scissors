@@ -1,4 +1,4 @@
-import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom } from '../services/room.service.js'
+import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom, attemptStart } from '../services/room.service.js'
 
 export async function createRoom(req, res) {
     let body = ''
@@ -70,26 +70,28 @@ export async function joinRoom(req, res) {
     }
 }
 
-export async function subscribeToRoom(req, res) {
-    let body = ''
-    for await (const chunk of req) body += chunk
-
+export function subscribeToRoom(req, res) {
     try {
-        if (!body) throw new Error('Empty body')
-        const data = JSON.parse(body)
+        const url = new URL(req.url, `http://${req.headers.host}`)
+        const params = url.searchParams
+
+        if (!params.get('room') || !params.get('user'))
+            throw new Error('MISSING_PARAMS')
+
+        const room = addSubscriberToRoom(params.get('room'), params.get('user'), res)
 
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
         })
 
-        addSubscriberToRoom(data.room, data.user, res)
+        res.write(`data: ${JSON.stringify({ type: 'subscribed' })}\n\n`)
 
-        res.write(JSON.stringify({
-            'status': 200,
-            'message': 'Subscribed to game'
-        }))
+        req.on('close', () => {
+            room.subscribers.delete(user)
+        })
     }
     catch (err) {
         if (err.message === 'ROOM_NOT_FOUND') {
@@ -99,6 +101,24 @@ export async function subscribeToRoom(req, res) {
             res.end(JSON.stringify({
                 'status': 404,
                 'message': 'Room not found'
+            }))
+        }
+        else if (err.message === 'USER_NOT_FOUND') {
+            res.writeHead(404, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify({
+                'status': 404,
+                'message': 'User not found'
+            }))
+        }
+        else if (err.message === 'MISSING_PARAMS') {
+            res.writeHead(400, {
+                'Content-Type': 'application/json'
+            })
+            res.end(JSON.stringify({
+                'status': 400,
+                'message': 'Missing parameters'
             }))
         }
         else {
@@ -168,5 +188,20 @@ export async function startGame(req, res) {
                 'message': err.message
             }))
         }
+    }
+}
+
+export async function playMove(req, res) {
+    let body = ''
+    for await (const chunk of req) body += chunk
+
+    try {
+        if (!body) throw new Error('Empty body')
+        const data = JSON.parse(body)
+
+        registerMove(data.user, data.room, data.move)
+    }
+    catch (err) {
+
     }
 }
