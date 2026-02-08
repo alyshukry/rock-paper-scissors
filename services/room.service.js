@@ -37,6 +37,7 @@ export function setOwnerOfRoom(room, user) {
 export function addSubscriberToRoom(room, user, res) {
     room = rooms.get(room)
     if (!room) throw new Error('ROOM_NOT_FOUND')
+    if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
 
     room.subscribers.set(user, res)
 }
