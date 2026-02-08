@@ -11,7 +11,9 @@ export function initRoom(password = null) {
         players: [],
         subscribers: new Map(),
         state: 'waiting',
-        moves: new Map()
+        moves: new Map(),
+        created: Date.now(),
+        lastActive: Date.now()
     }
     rooms.set(id, room)
 
@@ -22,8 +24,12 @@ export function initRoom(password = null) {
 export function addPlayerToRoom(room) {
     room = rooms.get(room)
     if (!room) throw new Error('ROOM_NOT_FOUND')
+    if (room.password && room.password !== password) throw new Error('INVALID_PASSWORD')
+    if (room.players.length >= 2) throw new Error('ROOM_FULL')
+
     const user = crypto.randomUUID()
     room.players.push(user)
+    room.lastActive = Date.now()
     return user
 }
 
@@ -41,6 +47,7 @@ export function addSubscriberToRoom(room, user, res) {
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
 
     room.subscribers.set(user, res)
+    room.lastActive = Date.now()
     return room
 }
 
@@ -50,6 +57,8 @@ export function attemptStart(room, user) {
     if (!room) throw new Error('ROOM_NOT_FOUND')
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
     if (room.owner !== user) throw new Error('USER_NOT_OWNER')
+    if (room.players.length < 2) throw new Error('NOT_ENOUGH_PLAYERS')
+    if (room.state === 'playing') throw new Error('GAME_ALREADY_STARTED')
 
     room.state = 'playing'
     for (const [user, res] of room.subscribers) {
@@ -57,7 +66,7 @@ export function attemptStart(room, user) {
             'type': 'game_started'
         })}\n\n`)
     }
-
+    room.lastActive = Date.now()
 }
 
 export function registerMove(user, room, move) {
@@ -66,6 +75,12 @@ export function registerMove(user, room, move) {
     if (!room) throw new Error('ROOM_NOT_FOUND')
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
     if (room.state !== 'playing') throw new Error('GAME_NOT_STARTED')
+    if (room.moves.has(user)) throw new Error('MOVE_ALREADY_PLAYED')
+    if (![
+        'rock', 'r',
+        'paper', 'p',
+        'scissors', 's'
+    ].includes(move.toLowerCase())) throw new Error('INVALID_MOVE')
 
     room.moves.set(user, move[0].toLowerCase())
     for (const [u, res] of room.subscribers) {
@@ -87,5 +102,23 @@ export function registerMove(user, room, move) {
 
         room.moves.clear()
         room.state = 'waiting'
+        room.lastActive = Date.now()
+    }
+}
+
+export function removePlayerFromRoom(room, user) {
+    room = rooms.get(room)
+    if (!room) return
+
+    room.subscribers.delete(user)
+
+    if (room.subscribers.size === 0) {
+        setTimeout(() => {
+            const currentRoom = rooms.get(room)
+            if (currentRoom && currentRoom.subscribers.size === 0) {
+                rooms.delete(room)
+                console.log(`Deleted empty room ${room}`)
+            }
+        }, 30 * 1000)
     }
 }

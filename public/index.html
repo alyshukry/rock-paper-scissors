@@ -19,6 +19,15 @@
                     `http://localhost:8000/room/subscribe?room=${room}&user=${user}`
                 )
                 es.onmessage = (e) => console.log('EVENT:', e.data)
+                es.onerror = (err) => {
+                    console.log('Connection lost, will auto-retry...')
+                    // EventSource will automatically try to reconnect
+                    // No manual intervention needed!
+                }
+
+                es.onopen = () => {
+                    console.log('Connected (or reconnected)!')
+                }
             })
             .catch(err => console.error('Failed to load rooms:', err))
     </script>

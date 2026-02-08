@@ -1,14 +1,16 @@
 {
-    "ca2ec564-6308-427a-8260-53f84e4901ee": {
-        "id": "ca2ec564-6308-427a-8260-53f84e4901ee",
+    "891203db-a912-44da-8b67-1ff1369d8e01": {
+        "id": "891203db-a912-44da-8b67-1ff1369d8e01",
         "password": null,
-        "owner": "2051471b-6a70-4d86-8404-ec43a1038722",
+        "owner": "787d034a-f72d-4819-8fef-6f5f63d82f1a",
         "players": [
-            "2051471b-6a70-4d86-8404-ec43a1038722",
-            "150716e1-726e-456e-9d50-6df176d43202"
+            "787d034a-f72d-4819-8fef-6f5f63d82f1a",
+            "4901b022-9436-43fd-a514-f90fe8507257"
         ],
         "subscribers": {},
-        "state": "playing",
-        "moves": {}
+        "state": "waiting",
+        "moves": {},
+        "created": 1770587045864,
+        "lastActive": 1770587316874
     }
 }
