@@ -22,7 +22,6 @@
                 es.onerror = (err) => {
                     console.log('Connection lost, will auto-retry...')
                     // EventSource will automatically try to reconnect
-                    // No manual intervention needed!
                 }
 
                 es.onopen = () => {
