@@ -1,5 +1,27 @@
 import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom, attemptStart, registerMove, removePlayerFromRoom } from '../services/room.service.js'
+import { rooms } from '../store/rooms.store.js'
 import { sendError, sendSuccess } from '../utils/response.helper.js'
+
+export function getRooms(res) {
+    try {
+        const data = []
+
+        for (const [id, room] of rooms) {
+            if (room.players.length < 2)
+                data.push({
+                    id: id,
+                    hasPassword: room.password !== null
+                })
+        }
+
+        sendSuccess(res,
+            data
+            , 200)
+    }
+    catch (err) {
+        sendError(res, err.message)
+    }
+}
 
 export async function createRoom(req, res) {
     let body = ''

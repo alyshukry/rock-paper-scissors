@@ -2,34 +2,8 @@
 <html>
 
 <body>
-    <script>
-        console.log('yo')
-        // Fetch the rooms file to get the first room
-        fetch('http://localhost:8000/rooms.json')
-            .then(res => res.json())
-            .then(rooms => {
-                // Pick first room and user
-                const roomIds = Object.keys(rooms)
-                if (!roomIds.length) throw new Error('No rooms available')
-
-                const room = roomIds[0]
-                const user = rooms[roomIds[0]].players[0]
-
-                const es = new EventSource(
-                    `http://localhost:8000/room/subscribe?room=${room}&user=${user}`
-                )
-                es.onmessage = (e) => console.log('EVENT:', e.data)
-                es.onerror = (err) => {
-                    console.log('Connection lost, will auto-retry...')
-                    // EventSource will automatically try to reconnect
-                }
-
-                es.onopen = () => {
-                    console.log('Connected (or reconnected)!')
-                }
-            })
-            .catch(err => console.error('Failed to load rooms:', err))
-    </script>
+    <ul id="rooms"></ul>
+    <script src="./script.js" type="module"></script>
 </body>
 
 </html>

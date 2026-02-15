@@ -1,6 +1,6 @@
 import http from 'node:http'
-import { createRoom, joinRoom, startGame, subscribeToRoom, playMove } from './routes/room.routes.js'
-import { saveRooms, rooms } from './store/rooms.store.js'
+import { createRoom, joinRoom, startGame, subscribeToRoom, playMove, getRooms } from './routes/room.routes.js'
+import { rooms } from './store/rooms.store.js'
 import { startCleanupScheduler } from './services/cleanup.service.js'
 
 const PORT = 8000
@@ -28,19 +28,18 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify(obj))
         return
     }
-    if (req.url.startsWith('/room/create') && req.method === 'POST')
+    if (req.url.startsWith('/rooms') && req.method === 'GET')
+        getRooms(res)
+    else if (req.url.startsWith('/room/create') && req.method === 'POST')
         await createRoom(req, res)
     else if (req.url.startsWith('/room/join') && req.method === 'PUT')
         await joinRoom(req, res)
     else if (req.url.startsWith('/room/subscribe') && req.method === 'GET')
-        await subscribeToRoom(req, res)
+        subscribeToRoom(req, res)
     else if (req.url.startsWith('/room/start') && req.method === 'POST')
         await startGame(req, res)
     else if (req.url.startsWith('/room/play') && req.method === 'POST')
         await playMove(req, res)
-
-    // TEMPORARY: save rooms after each request
-    saveRooms()
 })
 
 server.listen(PORT, () => {
