@@ -1,7 +1,7 @@
 import { rooms } from '../store/rooms.store.js'
 
 const ROOM_MAX_AGE = 60 * 60 * 1000
-const ROOM_INACTIVE_TIME = 10 * 60 * 1000
+const ROOM_INACTIVE_TIME = 5 * 60 * 1000
 
 export function cleanupOldRooms() {
     const now = Date.now()
@@ -9,7 +9,7 @@ export function cleanupOldRooms() {
 
     for (const [id, room] of rooms) {
         const age = now - room.createdAt
-        const inactiveTime = now - room.lastActivityAt
+        const inactiveTime = now - room.lastActive
 
         if (age > ROOM_MAX_AGE || inactiveTime > ROOM_INACTIVE_TIME) roomsToDelete.push(id)
     }
@@ -38,5 +38,5 @@ export function startCleanupScheduler() {
         if (deleted > 0) {
             console.log(`Cleanup: Removed ${deleted} old/inactive rooms`)
         }
-    }, 5 * 60 * 1000)
+    }, .5 * 60 * 1000)
 }
