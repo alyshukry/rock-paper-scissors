@@ -10,6 +10,7 @@ export function getRooms(res) {
             if (room.players.length < 2)
                 data.push({
                     id: id,
+                    name: room.name,
                     hasPassword: room.password !== null
                 })
         }
@@ -34,8 +35,10 @@ export async function createRoom(req, res) {
             if (typeof data.password !== 'string') throw new Error('INVALID_PASSWORD_TYPE')
             if (data.password.length < 4 || data.password.length > 50) throw new Error('INVALID_PASSWORD_LENGTH')
         }
-        const room = initRoom(data.password)
-        const user = addPlayerToRoom(room.id)
+        if (!data.name)
+            throw new Error('NO_ROOM_NAME_PROVIDED')
+        const room = initRoom(data.name, data.password)
+        const user = addPlayerToRoom(room.id, room.password)
         setOwnerOfRoom(room.id, user)
 
         sendSuccess(res, {
@@ -59,7 +62,7 @@ export async function joinRoom(req, res) {
         if (!data.room || typeof data.room !== 'string') throw new Error('INVALID_ROOM_ID')
         if (data.password !== undefined && data.password !== null && typeof data.password !== 'string') throw new Error('INVALID_PASSWORD_TYPE')
 
-        const user = addPlayerToRoom(data.room)
+        const user = addPlayerToRoom(data.room, data.password)
 
         sendSuccess(res, {
             'room': data.room,

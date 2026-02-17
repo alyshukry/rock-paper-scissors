@@ -4,6 +4,7 @@ export const ERROR_MESSAGES = {
     'ROOM_FULL': { status: 400, message: 'Room is full' },
     'INVALID_ROOM_ID': { status: 400, message: 'Room ID is required and must be a string' },
     'INVALID_ROOM_FORMAT': { status: 400, message: 'Invalid room ID format' },
+    'NO_ROOM_NAME_PROVIDED': { status: 400, message: 'Room name wasn\'t provided' },
     
     // user errors
     'USER_NOT_FOUND': { status: 404, message: 'User not found' },
@@ -12,6 +13,7 @@ export const ERROR_MESSAGES = {
     'INVALID_USER_FORMAT': { status: 400, message: 'Invalid user ID format' },
     
     // password errors
+    'WRONG_PASSWORD': { status: 403, message: 'Wrong password' },
     'INVALID_PASSWORD': { status: 401, message: 'Invalid password' },
     'INVALID_PASSWORD_TYPE': { status: 400, message: 'Password must be a string' },
     'INVALID_PASSWORD_LENGTH': { status: 400, message: 'Password must be between 4 and 50 characters' },

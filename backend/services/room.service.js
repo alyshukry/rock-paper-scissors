@@ -2,11 +2,12 @@ import crypto from 'node:crypto'
 import { rooms } from '../store/rooms.store.js'
 import { decideWinner } from './game.service.js'
 
-export function initRoom(password = null) {
+export function initRoom(name, password = null) {
     const id = crypto.randomUUID()
     const room = {
         id: id,
         password: password,
+        name: name,
         owner: '',
         players: [],
         subscribers: new Map(),
@@ -21,11 +22,11 @@ export function initRoom(password = null) {
 }
 
 // creates player and adds them to the room
-export function addPlayerToRoom(room) {
+export function addPlayerToRoom(room, password) {
     room = rooms.get(room)
     if (!room) throw new Error('ROOM_NOT_FOUND')
-    if (room.password && room.password !== password) throw new Error('INVALID_PASSWORD')
     if (room.players.length >= 2) throw new Error('ROOM_FULL')
+    if (room.password !== password) throw new Error('WRONG_PASSWORD')
 
     const user = crypto.randomUUID()
     room.players.push(user)
