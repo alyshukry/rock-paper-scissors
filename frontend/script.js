@@ -1,4 +1,4 @@
-import { createRoom, joinRoom, startRound, watchRoom } from './services/room.service.js'
+import { createRoom, joinRoom, startRound, watchRoom, playMove, leaveRoom } from './services/room.service.js'
 
 if (sessionStorage.getItem('dont-remember')) {
     sessionStorage.removeItem('room')
@@ -65,4 +65,21 @@ setInterval(displayRooms, 2500)
 
 document.querySelector('#lobby-section button#start-round').addEventListener('click', (e) => {
     startRound(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+})
+
+document.querySelectorAll('#game-section button.play-move').forEach((button) => {
+    button.addEventListener('click', (e) => {
+        if (button.id === 'rock')
+            playMove(sessionStorage.getItem('room'), sessionStorage.getItem('user'), 'rock')
+        else if (button.id === 'paper')
+            playMove(sessionStorage.getItem('room'), sessionStorage.getItem('user'), 'paper')
+        else if (button.id === 'scissors')
+            playMove(sessionStorage.getItem('room'), sessionStorage.getItem('user'), 'scissors')
+    })
+})
+
+document.querySelectorAll('button.leave-room').forEach((button) => {
+    button.addEventListener('click', (e) => {
+        leaveRoom(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+    })
 })

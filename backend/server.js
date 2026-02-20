@@ -1,5 +1,5 @@
 import http from 'node:http'
-import { createRoom, joinRoom, startGame, subscribeToRoom, playMove, getRooms } from './routes/room.routes.js'
+import { createRoom, joinRoom, startGame, subscribeToRoom, playMove, getRooms, leaveRoom } from './routes/room.routes.js'
 import { rooms } from './store/rooms.store.js'
 import { startCleanupScheduler } from './services/cleanup.service.js'
 
@@ -14,7 +14,7 @@ const server = http.createServer(async (req, res) => {
         res.end()
         return
     }
-    
+
     if (req.url.startsWith('/rooms') && req.method === 'GET')
         getRooms(res)
     else if (req.url.startsWith('/room/create') && req.method === 'POST')
@@ -27,6 +27,8 @@ const server = http.createServer(async (req, res) => {
         await startGame(req, res)
     else if (req.url.startsWith('/room/play') && req.method === 'POST')
         await playMove(req, res)
+    else if (req.url.startsWith('/room/leave') && req.method === 'POST')
+        await leaveRoom(req, res)
 })
 
 server.listen(PORT, () => {

@@ -1,3 +1,4 @@
+import { send } from 'node:process'
 import { addPlayerToRoom, initRoom, setOwnerOfRoom, addSubscriberToRoom, attemptStart, registerMove, removePlayerFromRoom } from '../services/room.service.js'
 import { rooms } from '../store/rooms.store.js'
 import { sendError, sendSuccess } from '../utils/response.helper.js'
@@ -133,14 +134,36 @@ export async function playMove(req, res) {
         const data = JSON.parse(body)
 
         if (!data.room || typeof data.room !== 'string') throw new Error('INVALID_ROOM_ID')
-        if (!data.room || typeof data.room !== 'string') throw new Error('INVALID_ROOM_ID')
+        if (!data.user || typeof data.user !== 'string') throw new Error('INVALID_USER_ID')
         if (!data.move || typeof data.move !== 'string') throw new Error('INVALID_MOVE_TYPE')
 
         registerMove(data.user, data.room, data.move)
 
         sendSuccess(res, {
             'message': 'Move registered successfully'
-        })
+        }, 200)
+    }
+    catch (err) {
+        sendError(res, err.message)
+    }
+}
+
+export async function leaveRoom(req, res) {
+    let body = ''
+    for await (const chunk of req) body += chunk
+
+    try {
+        if (!body) throw new Error('Empty body')
+        const data = JSON.parse(body)
+
+        if (!data.room || typeof data.room !== 'string') throw new Error('INVALID_ROOM_ID')
+        if (!data.user || typeof data.user !== 'string') throw new Error('INVALID_USER_ID')
+
+        removePlayerFromRoom(data.room, data.user)
+
+        sendSuccess(res, {
+            'message': 'Left room'
+        }, 200)
     }
     catch (err) {
         sendError(res, err.message)

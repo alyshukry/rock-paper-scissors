@@ -31,6 +31,13 @@ export function addPlayerToRoom(room, password) {
     const user = crypto.randomUUID()
     room.players.push(user)
     room.lastActive = Date.now()
+
+    for (const [u, res] of room.subscribers) {
+        res.write(`data: ${JSON.stringify({
+            'type': 'user_joined'
+        })}\n\n`)
+    }
+
     return user
 }
 
@@ -40,6 +47,13 @@ export function setOwnerOfRoom(room, user) {
     if (!room.players.includes(user)) throw new Error('USER_NOT_FOUND')
 
     room.owner = user
+
+    for (const [u, res] of room.subscribers) {
+        if (u === room.owner)
+            res.write(`data: ${JSON.stringify({
+                'type': 'room_ownership_transferred'
+            })}\n\n`)
+    }
 }
 
 export function addSubscriberToRoom(room, user, res) {
@@ -62,7 +76,7 @@ export function attemptStart(room, user) {
     if (room.state === 'playing') throw new Error('GAME_ALREADY_STARTED')
 
     room.state = 'playing'
-    for (const [user, res] of room.subscribers) {
+    for (const [u, res] of room.subscribers) {
         res.write(`data: ${JSON.stringify({
             'type': 'game_started'
         })}\n\n`)
@@ -111,7 +125,18 @@ export function removePlayerFromRoom(room, user) {
     room = rooms.get(room)
     if (!room) return
 
+    // transfer room ownership if user leaving is owner
+    if (room.owner === user) setOwnerOfRoom(room.id, room.players.find(u => u !== user))
+
     room.subscribers.delete(user)
+    room.players = room.players.filter(u => u !== user)
+    for (const [u, res] of room.subscribers) {
+        if (u !== user)
+            res.write(`data: ${JSON.stringify({
+                'type': 'user_left'
+            })}\n\n`)
+    }
+    room.state = 'waiting'
 
     if (room.subscribers.size === 0) {
         setTimeout(() => {

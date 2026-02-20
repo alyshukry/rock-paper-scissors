@@ -32,10 +32,9 @@ export async function joinRoom(room, password = null) {
         })
 
         const data = await res.json()
-
-        if (!res.ok) {
+        if (!res.ok)
             throw new Error(data.message || 'Failed to join room')
-        }
+
 
         sessionStorage.setItem('user', data.user)
         sessionStorage.setItem('room', data.room)
@@ -61,32 +60,59 @@ export function watchRoom(room, user) {
     }
 }
 
-export function startRound(room, user) {
-    fetch('http://localhost:8000/room/start', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ room: room, user: user })
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
+export async function startRound(room, user) {
+    try {
+        const res = await fetch('http://localhost:8000/room/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ room: room, user: user })
         })
-        .catch(err => console.error(err))
+
+        const data = await res.json()
+        if (!res.ok)
+            throw new Error(data.message || 'Failed to start round')
+    }
+    catch (err) {
+        alert(err.message)
+    }
 }
 
-export function playMove(room, user, move) {
-    fetch('http://localhost:8000/room/play', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ room: room, user: user, move: move })
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data)
+export async function playMove(room, user, move) {
+    try {
+        const res = await fetch('http://localhost:8000/room/play', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ room: room, user: user, move: move })
         })
-        .catch(err => console.error(err))
+
+        const data = await res.json()
+        if (!res.ok)
+            throw new Error(data.message || 'Failed to play move')
+    }
+    catch (err) {
+        alert(err.message)
+    }
+}
+
+export async function leaveRoom(room, user) {
+    try {
+        const res = await fetch('http://localhost:8000/room/leave', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ room: room, user: user })
+        })
+
+        const data = await res.json()
+        if (!res.ok)
+            throw new Error(data.message || 'Failed to leave room')
+    }
+    catch (err) {
+        alert(err.message)
+    }
 }
