@@ -1,3 +1,5 @@
+import { connectToRoom, disconnectFromRoom } from '../main.js'
+
 export async function createRoom(name, password = null) {
     try {
         const res = await fetch('http://localhost:8000/room/create', {
@@ -17,7 +19,7 @@ export async function createRoom(name, password = null) {
         sessionStorage.setItem('user', data.user)
         sessionStorage.setItem('room', data.room)
 
-        watchRoom(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+        connectToRoom(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
     }
     catch (err) {
         alert(err.message)
@@ -38,25 +40,10 @@ export async function joinRoom(room, password = null) {
 
         sessionStorage.setItem('user', data.user)
         sessionStorage.setItem('room', data.room)
-        watchRoom(room, data.user)
+        connectToRoom(room, data.user)
 
     } catch (err) {
         alert(err.message)
-    }
-}
-
-export function watchRoom(room, user) {
-    const es = new EventSource(
-        `http://localhost:8000/room/subscribe?room=${room}&user=${user}`
-    )
-
-    es.onmessage = (event) => {
-        const msg = JSON.parse(event.data)
-        console.log('Event received:', msg)
-    }
-
-    es.onerror = (err) => {
-        console.error('EventSource error:', err)
     }
 }
 
@@ -111,6 +98,8 @@ export async function leaveRoom(room, user) {
         const data = await res.json()
         if (!res.ok)
             throw new Error(data.message || 'Failed to leave room')
+
+        disconnectFromRoom()
     }
     catch (err) {
         alert(err.message)

@@ -63,7 +63,7 @@ export function addSubscriberToRoom(room, user, res) {
 
     room.subscribers.set(user, res)
     room.lastActive = Date.now()
-    return room
+    return { room, state: room.state, name: room.name }
 }
 
 export function attemptStart(room, user) {
@@ -124,9 +124,15 @@ export function registerMove(user, room, move) {
 export function removePlayerFromRoom(room, user) {
     room = rooms.get(room)
     if (!room) return
+    if (!room.players.includes(user)) return
 
-    // transfer room ownership if user leaving is owner
-    if (room.owner === user) setOwnerOfRoom(room.id, room.players.find(u => u !== user))
+    // transfer ownership if needed
+    if (room.owner === user) {
+        const newOwner = room.players.find(u => u !== user)
+        if (newOwner) {  // only transfer if there's someone to transfer to
+            setOwnerOfRoom(room.id, newOwner)
+        }
+    }
 
     room.subscribers.delete(user)
     room.players = room.players.filter(u => u !== user)

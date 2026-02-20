@@ -82,7 +82,7 @@ export function subscribeToRoom(req, res) {
 
         if (!params.get('room') || !params.get('user')) throw new Error('MISSING_PARAMS')
 
-        const room = addSubscriberToRoom(params.get('room'), params.get('user'), res)
+        const { room, state, roomName } = addSubscriberToRoom(params.get('room'), params.get('user'), res)
 
         res.writeHead(200, {
             'Content-Type': 'text/event-stream',
@@ -91,10 +91,18 @@ export function subscribeToRoom(req, res) {
             'Access-Control-Allow-Origin': '*',
         })
 
-        res.write(`data: ${JSON.stringify({ type: 'subscribed' })}\n\n`)
+        res.write(`data: ${JSON.stringify({
+            type: 'subscribed',
+            state: state,
+            room: roomName
+        })}\n\n`)
 
         req.on('close', () => {
-            removePlayerFromRoom(params.get('room'), params.get('user'))
+            try {
+                removePlayerFromRoom(params.get('room'), params.get('user'))
+            } catch (err) {
+                console.error('Error removing player on disconnect:', err)
+            }
         })
     }
     catch (err) {

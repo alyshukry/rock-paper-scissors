@@ -1,13 +1,68 @@
-import { createRoom, joinRoom, startRound, watchRoom, playMove, leaveRoom } from './services/room.service.js'
+import { createRoom, joinRoom, startRound, playMove, leaveRoom } from './services/room.service.js'
+import { showSection } from './utils/dom.helper.js'
 
-if (sessionStorage.getItem('dont-remember')) {
-    sessionStorage.removeItem('room')
-    sessionStorage.removeItem('user')
+let roomEventSource = null
+export function connectToRoom(room, user) {
+    roomEventSource = new EventSource(`http://localhost:8000/room/subscribe?room=${room}&user=${user}`)
+
+    roomEventSource.onmessage = (e) => {
+        handleServerEvent(JSON.parse(e.data))
+    }
+    roomEventSource.onerror = (err) => {
+        console.error('EventSource error:', err)
+        sessionStorage.clear()
+        showSection('rooms-section')
+    }
 }
 
-let room = sessionStorage.getItem('room')
-let user = sessionStorage.getItem('user')
-if (room && user) { watchRoom(room, user) }
+export function disconnectFromRoom() {
+    if (roomEventSource) {
+        roomEventSource.close()
+        roomEventSource = null
+        sessionStorage.clear()
+        showSection('rooms-section')
+    }
+}
+
+function handleServerEvent(msg) {
+    console.log(msg)
+    switch (msg.type) {
+        case 'subscribed':
+            if (msg.state === 'waiting')
+                showSection('lobby-section')
+            else if (msg.state === 'waiting')
+                showSection('lobby-section')
+            break
+        case 'game_started':
+            showSection('game-section')
+            document.querySelector('p#opponent-status').innerHTML = 'Waiting for opponent\'s move..'
+            break
+        case 'move_played':
+            document.querySelector('p#opponent-status').innerHTML = 'Opponent played their move'
+            break
+        case 'game_result':
+            showSection('result-section')
+            if (msg.result === 'win')
+                document.querySelector('p#game-result').innerHTML = 'You win!'
+            else if (msg.result === 'lose')
+                document.querySelector('p#game-result').innerHTML = 'You lose!'
+            else if (msg.result === 'draw')
+                document.querySelector('p#game-result').innerHTML = 'Draw!'
+            break
+    }
+}
+
+async function initApp() {
+    const room = sessionStorage.getItem('room')
+    const user = sessionStorage.getItem('user')
+
+    if (!room || !user) {
+        showSection('rooms-section')
+        sessionStorage.clear()
+    }
+    else connectToRoom(room, user)
+}
+initApp()
 
 document.querySelector('form#create-room').addEventListener('submit', (e) => {
     e.preventDefault()  // stop page reload
@@ -63,8 +118,10 @@ async function displayRooms() {
 displayRooms()
 setInterval(displayRooms, 2500)
 
-document.querySelector('#lobby-section button#start-round').addEventListener('click', (e) => {
-    startRound(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+document.querySelectorAll('button.start-round').forEach((button) => {
+    button.addEventListener('click', (e) => {
+        startRound(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+    })
 })
 
 document.querySelectorAll('#game-section button.play-move').forEach((button) => {
