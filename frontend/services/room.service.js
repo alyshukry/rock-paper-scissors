@@ -46,7 +46,7 @@ export async function joinRoom(room, password = null) {
     }
 }
 
-function watchRoom(room, user) {
+export function watchRoom(room, user) {
     const es = new EventSource(
         `http://localhost:8000/room/subscribe?room=${room}&user=${user}`
     )
@@ -61,7 +61,7 @@ function watchRoom(room, user) {
     }
 }
 
-function startGame(room, user) {
+export function startRound(room, user) {
     fetch('http://localhost:8000/room/start', {
         method: 'POST',
         headers: {
@@ -76,7 +76,7 @@ function startGame(room, user) {
         .catch(err => console.error(err))
 }
 
-function playMove(room, user, move) {
+export function playMove(room, user, move) {
     fetch('http://localhost:8000/room/play', {
         method: 'POST',
         headers: {

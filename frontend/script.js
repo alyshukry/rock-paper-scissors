@@ -1,12 +1,12 @@
-import { createRoom, joinRoom } from './services/room.service.js'
+import { createRoom, joinRoom, startRound, watchRoom } from './services/room.service.js'
 
 if (sessionStorage.getItem('dont-remember')) {
     sessionStorage.removeItem('room')
     sessionStorage.removeItem('user')
 }
 
-const room = sessionStorage.getItem('room')
-const user = sessionStorage.getItem('user')
+let room = sessionStorage.getItem('room')
+let user = sessionStorage.getItem('user')
 if (room && user) { watchRoom(room, user) }
 
 document.querySelector('form#create-room').addEventListener('submit', (e) => {
@@ -62,3 +62,7 @@ async function displayRooms() {
 }
 displayRooms()
 setInterval(displayRooms, 2500)
+
+document.querySelector('#lobby-section button#start-round').addEventListener('click', (e) => {
+    startRound(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+})
