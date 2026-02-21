@@ -29,6 +29,7 @@ export function addPlayerToRoom(room, password) {
     if (room.password !== password) throw new Error('WRONG_PASSWORD')
 
     const user = crypto.randomUUID()
+    if (room.players.length < 1) room.owner = user
     room.players.push(user)
     room.lastActive = Date.now()
 

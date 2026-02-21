@@ -49,6 +49,9 @@ function handleServerEvent(msg) {
             else if (msg.result === 'draw')
                 document.querySelector('p#game-result').innerHTML = 'Draw!'
             break
+        case 'user_left':
+            showSection('lobby-section')
+            break
     }
 }
 
