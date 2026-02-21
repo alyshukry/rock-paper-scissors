@@ -31,12 +31,6 @@
         <button class="start-round">Start round</button>
         <button class="leave-room">Leave room</button>
     </div>
-    <p id="ids"></p>
-    <script>
-        setInterval(() => {
-            document.querySelector('p#ids').innerHTML = `room: ${sessionStorage.getItem('room')?.slice(0, 4)}, user: ${sessionStorage.getItem('user')?.slice(0, 4)}`
-        }, 100)
-    </script>
     <script src="./main.js" type="module"></script>
 </body>
 
