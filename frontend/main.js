@@ -3,7 +3,7 @@ import { showSection } from './utils/dom.helper.js'
 
 let roomEventSource = null
 export function connectToRoom(room, user) {
-    roomEventSource = new EventSource(`http://localhost:8000/room/subscribe?room=${room}&user=${user}`)
+    roomEventSource = new EventSource(`https://rock-paper-scissors-kgfh.onrender.com/room/subscribe?room=${room}&user=${user}`)
 
     roomEventSource.onmessage = (e) => {
         handleServerEvent(JSON.parse(e.data))
@@ -80,7 +80,7 @@ const roomsList = document.querySelector('ul#rooms')
 
 async function displayRooms() {
     if (!sessionStorage.getItem('room') && !roomsList.querySelector('form')) {
-        const raw = await fetch('http://localhost:8000/rooms')
+        const raw = await fetch('https://rock-paper-scissors-kgfh.onrender.com/rooms')
         const data = await raw.json()
 
         if (data.length < 1) {

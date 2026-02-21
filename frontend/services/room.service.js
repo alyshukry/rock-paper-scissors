@@ -2,7 +2,7 @@ import { connectToRoom, disconnectFromRoom } from '../main.js'
 
 export async function createRoom(name, password = null) {
     try {
-        const res = await fetch('http://localhost:8000/room/create', {
+        const res = await fetch('https://rock-paper-scissors-kgfh.onrender.com/room/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export async function createRoom(name, password = null) {
 }
 export async function joinRoom(room, password = null) {
     try {
-        const res = await fetch('http://localhost:8000/room/join', {
+        const res = await fetch('https://rock-paper-scissors-kgfh.onrender.com/room/join', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ room: room, password: password })
@@ -49,7 +49,7 @@ export async function joinRoom(room, password = null) {
 
 export async function startRound(room, user) {
     try {
-        const res = await fetch('http://localhost:8000/room/start', {
+        const res = await fetch('https://rock-paper-scissors-kgfh.onrender.com/room/start', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export async function startRound(room, user) {
 
 export async function playMove(room, user, move) {
     try {
-        const res = await fetch('http://localhost:8000/room/play', {
+        const res = await fetch('https://rock-paper-scissors-kgfh.onrender.com/room/play', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export async function playMove(room, user, move) {
 
 export async function leaveRoom(room, user) {
     try {
-        const res = await fetch('http://localhost:8000/room/leave', {
+        const res = await fetch('https://rock-paper-scissors-kgfh.onrender.com/room/leave', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
