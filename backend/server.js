@@ -3,7 +3,7 @@ import { createRoom, joinRoom, startGame, subscribeToRoom, playMove, getRooms, l
 import { rooms } from './store/rooms.store.js'
 import { startCleanupScheduler } from './services/cleanup.service.js'
 
-const PORT = 8000
+const PORT = process.env.PORT || 8000
 const server = http.createServer(async (req, res) => {
 
     res.setHeader('Access-Control-Allow-Origin', '*')
