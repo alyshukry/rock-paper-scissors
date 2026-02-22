@@ -17,10 +17,10 @@ export async function createRoom(name, password = null) {
             throw new Error(data.message || 'Failed to create room')
         }
 
-        sessionStorage.setItem('user', data.user)
-        sessionStorage.setItem('room', data.room)
+        localStorage.setItem('user', data.user)
+        localStorage.setItem('room', data.room)
 
-        connectToRoom(sessionStorage.getItem('room'), sessionStorage.getItem('user'))
+        connectToRoom(localStorage.getItem('room'), localStorage.getItem('user'))
     }
     catch (err) {
         alert(err.message)
@@ -39,8 +39,8 @@ export async function joinRoom(room, password = null) {
             throw new Error(data.message || 'Failed to join room')
 
 
-        sessionStorage.setItem('user', data.user)
-        sessionStorage.setItem('room', data.room)
+        localStorage.setItem('user', data.user)
+        localStorage.setItem('room', data.room)
         connectToRoom(room, data.user)
 
     } catch (err) {
