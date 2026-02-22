@@ -122,7 +122,7 @@ export function registerMove(user, room, move) {
     }
 }
 
-export function removePlayerFromRoom(room, user) {
+export function removePlayerFromRoom(room, user, intentional = true) {
     room = rooms.get(room)
     if (!room) return
     if (!room.players.includes(user)) return
@@ -136,22 +136,17 @@ export function removePlayerFromRoom(room, user) {
     }
 
     room.subscribers.delete(user)
-    room.players = room.players.filter(u => u !== user)
+    if (intentional) room.players = room.players.filter(u => u !== user)
     for (const [u, res] of room.subscribers) {
         if (u !== user)
             res.write(`data: ${JSON.stringify({
-                'type': 'user_left'
+                'type': intentional ? 'user_left' : 'user_disconnected'
             })}\n\n`)
     }
-    room.state = 'waiting'
 
-    if (room.subscribers.size === 0) {
-        setTimeout(() => {
-            const currentRoom = rooms.get(room)
-            if (currentRoom && currentRoom.subscribers.size === 0) {
-                rooms.delete(room)
-                console.log(`Deleted empty room ${room}`)
-            }
-        }, 30 * 1000)
-    }
+    if (!intentional) setTimeout(() => {
+        room.players = room.players.filter(u => u !== user)
+    }, 30 * 1000)
+
+    room.state = 'waiting'
 }

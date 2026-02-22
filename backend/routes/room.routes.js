@@ -100,7 +100,7 @@ export function subscribeToRoom(req, res) {
 
         req.on('close', () => {
             try {
-                removePlayerFromRoom(params.get('room'), params.get('user'))
+                removePlayerFromRoom(params.get('room'), params.get('user'), false)
             } catch (err) {
                 console.error('Error removing player on disconnect:', err)
             }

@@ -53,6 +53,8 @@ function handleServerEvent(msg) {
         case 'user_left':
             showSection('lobby-section')
             break
+        case 'ownership_granted':
+            document.querySelectorAll('button.start-round').forEach((button) => button.style.display = 'inline-block')
     }
 }
 
