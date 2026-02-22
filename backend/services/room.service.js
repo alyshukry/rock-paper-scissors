@@ -52,7 +52,7 @@ export function setOwnerOfRoom(room, user) {
     for (const [u, res] of room.subscribers) {
         if (u === room.owner)
             res.write(`data: ${JSON.stringify({
-                'type': 'room_ownership_transferred'
+                'type': 'ownership_granted'
             })}\n\n`)
     }
 }

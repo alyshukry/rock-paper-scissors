@@ -95,6 +95,8 @@ export function subscribeToRoom(req, res) {
             state: state,
             room: roomName
         })}\n\n`)
+        if (room.owner === params.get('user'))
+            res.write(`data: ${JSON.stringify({ type: 'ownership_granted' })}\n\n`)
 
         req.on('close', () => {
             try {
