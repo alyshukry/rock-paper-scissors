@@ -1,9 +1,10 @@
+import API_URL from './config.js'
 import { createRoom, joinRoom, startRound, playMove, leaveRoom } from './services/room.service.js'
 import { showSection } from './utils/dom.helper.js'
 
 let roomEventSource = null
 export function connectToRoom(room, user) {
-    roomEventSource = new EventSource(`https://rock-paper-scissors-kgfh.onrender.com/room/subscribe?room=${room}&user=${user}`)
+    roomEventSource = new EventSource(API_URL + `/room/subscribe?room=${room}&user=${user}`)
 
     roomEventSource.onmessage = (e) => {
         handleServerEvent(JSON.parse(e.data))
@@ -80,11 +81,16 @@ const roomsList = document.querySelector('ul#rooms')
 
 async function displayRooms() {
     if (!sessionStorage.getItem('room') && !roomsList.querySelector('form')) {
-        const raw = await fetch('https://rock-paper-scissors-kgfh.onrender.com/rooms')
-        const data = await raw.json()
+        const res = await fetch(API_URL + '/rooms')
+
+        if (!res.ok) {
+            roomsList.innerHTML = 'Failed to reach server'
+            return
+        }
+        const data = await res.json()
 
         if (data.length < 1) {
-            roomsList.innerHTML = 'no rooms'
+            roomsList.innerHTML = 'No rooms'
             return
         }
 
