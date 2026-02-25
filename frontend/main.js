@@ -65,7 +65,6 @@ function handleServerEvent(msg) {
             break
     }
 }
-console.log(API_URL)
 
 async function initApp() {
     const room = localStorage.getItem('room')
